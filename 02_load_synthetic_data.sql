@@ -228,8 +228,8 @@ SELECT
     END,
     -- Sentiment correlated with rating (using same RATING_RAND value)
     CASE 
-        WHEN RATING_RAND <= 75 THEN 'Positive'     -- Most 5.0 and 4.0 ratings (70% + partial 4.0s)
-        WHEN RATING_RAND <= 92 THEN 'Neutral'      -- 3.0 ratings and some 4.0s
+        WHEN RATING_RAND <= 85 THEN 'Positive'     -- All 5.0 and 4.0 ratings
+        WHEN RATING_RAND <= 92 THEN 'Neutral'      -- 3.0 ratings
         ELSE 'Negative'                             -- 2.0 and 1.0 ratings
     END
 FROM FEEDBACK_BASE;
