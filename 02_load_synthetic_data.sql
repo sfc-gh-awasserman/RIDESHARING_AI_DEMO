@@ -186,7 +186,7 @@ VALUES
     ('RES020', 'CAMP007', 'Driver Signups', 34, '2024-06-30', 'National');
 
 -- Insert Rider Feedback
--- Using a CTE to ensure rating and sentiment are correlated
+-- Using a CTE to ensure rating, sentiment, and comments are all correlated
 WITH FEEDBACK_BASE AS (
     SELECT
         seq4() AS SEQ_NUM,
@@ -194,8 +194,7 @@ WITH FEEDBACK_BASE AS (
         UNIFORM(0, 9, RANDOM()) AS CLIENT_IDX,
         UNIFORM(0, 9, RANDOM()) AS DRIVER_IDX,
         UNIFORM(0, 90, RANDOM()) AS DAYS_AGO,
-        UNIFORM(1, 100, RANDOM()) AS RATING_RAND,
-        UNIFORM(1, 10, RANDOM()) AS COMMENT_IDX
+        UNIFORM(1, 100, RANDOM()) AS RATING_RAND
     FROM TABLE(GENERATOR(ROWCOUNT => 1200))
 )
 INSERT INTO RIDER_FEEDBACK (FEEDBACK_ID, RIDE_ID, CLIENT_ID, DRIVER_ID, FEEDBACK_DATE, RATING, COMMENTS, SENTIMENT)
@@ -213,18 +212,39 @@ SELECT
         WHEN RATING_RAND <= 97 THEN 2.0
         ELSE 1.0
     END,
-    -- Comments
-    CASE COMMENT_IDX
-        WHEN 1 THEN 'Driver was excellent, very professional and great with my child'
-        WHEN 2 THEN 'On time pickup and safe ride'
-        WHEN 3 THEN 'Driver was late and seemed rushed'
-        WHEN 4 THEN 'Perfect experience, will request this driver again'
-        WHEN 5 THEN 'Communication could be better'
-        WHEN 6 THEN 'Outstanding service, my child feels very safe'
-        WHEN 7 THEN 'Driver was friendly but navigation was poor'
-        WHEN 8 THEN 'Excellent! Driver went above and beyond'
-        WHEN 9 THEN 'Vehicle was not as clean as expected'
-        ELSE 'Great experience overall'
+    -- Comments correlated with rating/sentiment
+    CASE 
+        -- Positive comments (for 5.0 and 4.0 ratings)
+        WHEN RATING_RAND <= 85 THEN 
+            ARRAY_CONSTRUCT(
+                'Driver was excellent, very professional and great with my child',
+                'On time pickup and safe ride',
+                'Perfect experience, will request this driver again',
+                'Outstanding service, my child feels very safe',
+                'Excellent! Driver went above and beyond',
+                'Great experience overall',
+                'Very friendly and careful driver',
+                'My child loved the ride'
+            )[UNIFORM(0, 7, RANDOM())]
+        -- Neutral comments (for 3.0 ratings)
+        WHEN RATING_RAND <= 92 THEN
+            ARRAY_CONSTRUCT(
+                'Decent ride, nothing special',
+                'Communication could be better',
+                'Driver was friendly but navigation was poor',
+                'Average experience',
+                'On time but seemed distracted'
+            )[UNIFORM(0, 4, RANDOM())]
+        -- Negative comments (for 2.0 and 1.0 ratings)
+        ELSE
+            ARRAY_CONSTRUCT(
+                'Driver was late and seemed rushed',
+                'Vehicle was not as clean as expected',
+                'Poor communication throughout',
+                'Not satisfied with the service',
+                'Driver seemed unprofessional',
+                'Would not recommend'
+            )[UNIFORM(0, 5, RANDOM())]
     END,
     -- Sentiment correlated with rating (using same RATING_RAND value)
     CASE 
