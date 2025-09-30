@@ -186,21 +186,35 @@ VALUES
     ('RES020', 'CAMP007', 'Driver Signups', 34, '2024-06-30', 'National');
 
 -- Insert Rider Feedback
+-- Using a CTE to ensure rating and sentiment are correlated
+WITH FEEDBACK_BASE AS (
+    SELECT
+        seq4() AS SEQ_NUM,
+        UNIFORM(1, 5000, RANDOM()) AS RIDE_NUM,
+        UNIFORM(0, 9, RANDOM()) AS CLIENT_IDX,
+        UNIFORM(0, 9, RANDOM()) AS DRIVER_IDX,
+        UNIFORM(0, 90, RANDOM()) AS DAYS_AGO,
+        UNIFORM(1, 100, RANDOM()) AS RATING_RAND,
+        UNIFORM(1, 10, RANDOM()) AS COMMENT_IDX
+    FROM TABLE(GENERATOR(ROWCOUNT => 1200))
+)
 INSERT INTO RIDER_FEEDBACK (FEEDBACK_ID, RIDE_ID, CLIENT_ID, DRIVER_ID, FEEDBACK_DATE, RATING, COMMENTS, SENTIMENT)
 SELECT
-    'FB' || LPAD(seq4(), 6, '0'),
-    'RIDE' || LPAD(UNIFORM(1, 5000, RANDOM()), 6, '0'),
-    ARRAY_CONSTRUCT('CLI001', 'CLI002', 'CLI003', 'CLI004', 'CLI005', 'CLI006', 'CLI007', 'CLI008', 'CLI009', 'CLI010')[UNIFORM(0, 9, RANDOM())],
-    ARRAY_CONSTRUCT('DRV001', 'DRV002', 'DRV003', 'DRV004', 'DRV005', 'DRV006', 'DRV007', 'DRV008', 'DRV009', 'DRV010')[UNIFORM(0, 9, RANDOM())],
-    DATEADD(day, -UNIFORM(0, 90, RANDOM()), CURRENT_DATE()),
+    'FB' || LPAD(SEQ_NUM, 6, '0'),
+    'RIDE' || LPAD(RIDE_NUM, 6, '0'),
+    ARRAY_CONSTRUCT('CLI001', 'CLI002', 'CLI003', 'CLI004', 'CLI005', 'CLI006', 'CLI007', 'CLI008', 'CLI009', 'CLI010')[CLIENT_IDX],
+    ARRAY_CONSTRUCT('DRV001', 'DRV002', 'DRV003', 'DRV004', 'DRV005', 'DRV006', 'DRV007', 'DRV008', 'DRV009', 'DRV010')[DRIVER_IDX],
+    DATEADD(day, -DAYS_AGO, CURRENT_DATE()),
+    -- Rating based on RATING_RAND
     CASE 
-        WHEN UNIFORM(1, 100, RANDOM()) <= 70 THEN 5.0
-        WHEN UNIFORM(1, 100, RANDOM()) <= 85 THEN 4.0
-        WHEN UNIFORM(1, 100, RANDOM()) <= 92 THEN 3.0
-        WHEN UNIFORM(1, 100, RANDOM()) <= 97 THEN 2.0
+        WHEN RATING_RAND <= 70 THEN 5.0
+        WHEN RATING_RAND <= 85 THEN 4.0
+        WHEN RATING_RAND <= 92 THEN 3.0
+        WHEN RATING_RAND <= 97 THEN 2.0
         ELSE 1.0
     END,
-    CASE UNIFORM(1, 10, RANDOM())
+    -- Comments
+    CASE COMMENT_IDX
         WHEN 1 THEN 'Driver was excellent, very professional and great with my child'
         WHEN 2 THEN 'On time pickup and safe ride'
         WHEN 3 THEN 'Driver was late and seemed rushed'
@@ -212,12 +226,13 @@ SELECT
         WHEN 9 THEN 'Vehicle was not as clean as expected'
         ELSE 'Great experience overall'
     END,
+    -- Sentiment correlated with rating (using same RATING_RAND value)
     CASE 
-        WHEN UNIFORM(1, 100, RANDOM()) <= 75 THEN 'Positive'
-        WHEN UNIFORM(1, 100, RANDOM()) <= 90 THEN 'Neutral'
-        ELSE 'Negative'
+        WHEN RATING_RAND <= 75 THEN 'Positive'     -- Most 5.0 and 4.0 ratings (70% + partial 4.0s)
+        WHEN RATING_RAND <= 92 THEN 'Neutral'      -- 3.0 ratings and some 4.0s
+        ELSE 'Negative'                             -- 2.0 and 1.0 ratings
     END
-FROM TABLE(GENERATOR(ROWCOUNT => 1200));
+FROM FEEDBACK_BASE;
 
 -- Insert Market Leads
 INSERT INTO MARKET_LEADS (LEAD_ID, LEAD_NAME, LEAD_TYPE, STATE, CITY, LEAD_DATE, CONVERTED_TO_CLIENT, CONVERSION_DATE, MARKETING_SOURCE)
