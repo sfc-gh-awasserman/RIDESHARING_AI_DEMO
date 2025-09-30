@@ -1,11 +1,20 @@
-# Semantic View Descriptions
+# Semantic Model Description
 
 ## Overview
-This document provides detailed descriptions of all semantic views created for the Ridesharing Company Snowflake Intelligence demo. These views are optimized for natural language querying and provide pre-calculated metrics for common business questions.
+This document provides detailed descriptions of the semantic model created for the Ridesharing Company Snowflake Intelligence demo. The semantic model (`RIDESHARE_ANALYTICS`) is built using Snowflake's `SYSTEM$CREATE_SEMANTIC_VIEW_FROM_YAML` function and is optimized for natural language querying with Snowflake Intelligence.
+
+### What's in the Semantic Model
+- **8 Tables**: Clients, CareDrivers, Rides, Marketing Campaigns, Campaign Results, Rider Feedback, Market Leads
+- **6 Relationships**: Defining how tables connect (e.g., Rides to Clients, Rides to Drivers)
+- **30+ Pre-defined Metrics**: Including revenue, completion rates, ROAS, conversion rates, etc.
+
+The semantic model is defined in `03_create_semantic_model.sql` using YAML configuration. This document provides conceptual descriptions to help understand the data model.
 
 ---
 
-## RIDESHARE_ANALYTICS_VIEW
+## Tables in the Semantic Model
+
+### CLIENTS
 
 ### Purpose
 Comprehensive analytical view that combines ride, client, and driver data with time-based analysis fields. This is the primary view for most analytical queries.

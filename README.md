@@ -22,7 +22,7 @@ RIDESHARING_AI_DEMO/
 ├── README.md                          # This file
 ├── 01_create_database_schema.sql      # Database and table definitions
 ├── 02_load_synthetic_data.sql         # Synthetic data generation
-├── 03_create_semantic_view.sql        # Semantic views for analytics
+├── 03_create_semantic_model.sql       # Semantic model using YAML configuration
 ├── agent_instructions.md              # AI agent configuration
 └── semantic_view_description.md       # Detailed view documentation
 ```
@@ -85,16 +85,16 @@ This generates:
 - 1,200+ feedback entries
 - 10 leads with conversion tracking
 
-### Step 3: Create Semantic Views
+### Step 3: Create Semantic Model
 
-Run the third SQL script to create optimized analytical views:
+Run the third SQL script to create the semantic model using YAML configuration:
 
 ```sql
 -- Execute in Snowflake
-@03_create_semantic_view.sql
+@03_create_semantic_model.sql
 ```
 
-This creates 6 semantic views designed for natural language querying.
+This creates a comprehensive semantic model with tables, relationships, and pre-defined metrics for Snowflake Intelligence.
 
 ### Step 4: Configure Snowflake Intelligence
 
@@ -335,8 +335,9 @@ This demo is designed for Snowflake customer presentations and can be customized
 
 - [ ] Execute `01_create_database_schema.sql`
 - [ ] Execute `02_load_synthetic_data.sql`
-- [ ] Execute `03_create_semantic_view.sql`
+- [ ] Execute `03_create_semantic_model.sql`
 - [ ] Verify data loaded (check row counts)
+- [ ] Verify semantic model created (SHOW SEMANTIC MODELS)
 - [ ] Configure Snowflake Intelligence agent
 - [ ] Load agent instructions from `agent_instructions.md`
 - [ ] Test with sample questions

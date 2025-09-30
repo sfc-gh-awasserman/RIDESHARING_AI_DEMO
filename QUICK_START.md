@@ -13,8 +13,8 @@ Open Snowflake and run these scripts in order:
 -- 2. Load data (1 minute)
 @02_load_synthetic_data.sql
 
--- 3. Create views (30 seconds)
-@03_create_semantic_view.sql
+-- 3. Create semantic model (30 seconds)
+@03_create_semantic_model.sql
 ```
 
 ### Step 2: Verify Data Loaded (30 seconds)
@@ -26,8 +26,8 @@ USE SCHEMA RIDESHARE_DATA;
 -- Should show ~5,450 rides
 SELECT COUNT(*) FROM RIDES;
 
--- Should show 6 views
-SHOW VIEWS;
+-- Should show 1 semantic model
+SHOW SEMANTIC MODELS;
 ```
 
 ### Step 3: Configure Snowflake Intelligence (1 minute)
@@ -37,7 +37,7 @@ SHOW VIEWS;
    - **Name**: Ridesharing Analytics Agent
    - **Database**: `RIDESHARE_DEMO`
    - **Schema**: `RIDESHARE_DATA`
-   - **Select Views**: All 6 semantic views
+   - **Semantic Model**: `RIDESHARE_ANALYTICS`
 3. Copy instructions from `agent_instructions.md` → paste into agent configuration
 4. Save and activate
 
@@ -226,7 +226,7 @@ SHOW VIEWS;
 | `semantic_view_description.md` | View documentation | Understanding data model |
 | `01_create_database_schema.sql` | Schema setup | First-time setup |
 | `02_load_synthetic_data.sql` | Data loading | First-time setup or refresh |
-| `03_create_semantic_view.sql` | View creation | First-time setup |
+| `03_create_semantic_model.sql` | Semantic model creation | First-time setup |
 
 ---
 
@@ -234,7 +234,8 @@ SHOW VIEWS;
 
 - [ ] All 3 SQL scripts executed successfully
 - [ ] Data verification query returns 5,450+ rides
-- [ ] Snowflake Intelligence agent configured with all 6 views
+- [ ] Semantic model verified (SHOW SEMANTIC MODELS returns RIDESHARE_ANALYTICS)
+- [ ] Snowflake Intelligence agent configured with semantic model
 - [ ] Agent instructions loaded from `agent_instructions.md`
 - [ ] Tested at least 3 sample questions
 - [ ] Reviewed key insights above
