@@ -82,16 +82,16 @@ SELECT
                     'DRV021', 'DRV022', 'DRV023', 'DRV024', 'DRV025')[UNIFORM(0, 24, RANDOM())],
     DATEADD(day, -UNIFORM(0, 365, RANDOM()), CURRENT_DATE()),
     TIME_FROM_PARTS(UNIFORM(6, 18, RANDOM()), UNIFORM(0, 59, RANDOM()), 0),
-    CASE UNIFORM(1, 100, RANDOM())
-        WHEN <= 60 THEN 'General'
-        WHEN <= 78 THEN 'Special Needs'
-        WHEN <= 88 THEN 'McKinney-Vento'
+    CASE 
+        WHEN UNIFORM(1, 100, RANDOM()) <= 60 THEN 'General'
+        WHEN UNIFORM(1, 100, RANDOM()) <= 78 THEN 'Special Needs'
+        WHEN UNIFORM(1, 100, RANDOM()) <= 88 THEN 'McKinney-Vento'
         ELSE 'Foster Care'
     END,
     UNIFORM(25, 150, RANDOM()) + (UNIFORM(0, 99, RANDOM()) / 100.0),
-    CASE UNIFORM(1, 100, RANDOM())
-        WHEN <= 85 THEN 'Completed'
-        WHEN <= 93 THEN 'Cancelled'
+    CASE 
+        WHEN UNIFORM(1, 100, RANDOM()) <= 85 THEN 'Completed'
+        WHEN UNIFORM(1, 100, RANDOM()) <= 93 THEN 'Cancelled'
         ELSE 'No-Show'
     END,
     CASE 
@@ -118,9 +118,9 @@ SELECT
     TIME_FROM_PARTS(UNIFORM(6, 18, RANDOM()), UNIFORM(0, 59, RANDOM()), 0),
     'McKinney-Vento',
     UNIFORM(25, 150, RANDOM()) + (UNIFORM(0, 99, RANDOM()) / 100.0),
-    CASE UNIFORM(1, 100, RANDOM())
-        WHEN <= 88 THEN 'Completed'
-        WHEN <= 95 THEN 'Cancelled'
+    CASE 
+        WHEN UNIFORM(1, 100, RANDOM()) <= 88 THEN 'Completed'
+        WHEN UNIFORM(1, 100, RANDOM()) <= 95 THEN 'Cancelled'
         ELSE 'No-Show'
     END,
     CASE 
@@ -193,11 +193,11 @@ SELECT
     ARRAY_CONSTRUCT('CLI001', 'CLI002', 'CLI003', 'CLI004', 'CLI005', 'CLI006', 'CLI007', 'CLI008', 'CLI009', 'CLI010')[UNIFORM(0, 9, RANDOM())],
     ARRAY_CONSTRUCT('DRV001', 'DRV002', 'DRV003', 'DRV004', 'DRV005', 'DRV006', 'DRV007', 'DRV008', 'DRV009', 'DRV010')[UNIFORM(0, 9, RANDOM())],
     DATEADD(day, -UNIFORM(0, 90, RANDOM()), CURRENT_DATE()),
-    CASE UNIFORM(1, 100, RANDOM())
-        WHEN <= 70 THEN 5.0
-        WHEN <= 85 THEN 4.0
-        WHEN <= 92 THEN 3.0
-        WHEN <= 97 THEN 2.0
+    CASE 
+        WHEN UNIFORM(1, 100, RANDOM()) <= 70 THEN 5.0
+        WHEN UNIFORM(1, 100, RANDOM()) <= 85 THEN 4.0
+        WHEN UNIFORM(1, 100, RANDOM()) <= 92 THEN 3.0
+        WHEN UNIFORM(1, 100, RANDOM()) <= 97 THEN 2.0
         ELSE 1.0
     END,
     CASE UNIFORM(1, 10, RANDOM())
@@ -212,9 +212,9 @@ SELECT
         WHEN 9 THEN 'Vehicle was not as clean as expected'
         ELSE 'Great experience overall'
     END,
-    CASE UNIFORM(1, 100, RANDOM())
-        WHEN <= 75 THEN 'Positive'
-        WHEN <= 90 THEN 'Neutral'
+    CASE 
+        WHEN UNIFORM(1, 100, RANDOM()) <= 75 THEN 'Positive'
+        WHEN UNIFORM(1, 100, RANDOM()) <= 90 THEN 'Neutral'
         ELSE 'Negative'
     END
 FROM TABLE(GENERATOR(ROWCOUNT => 1200));
