@@ -1,0 +1,141 @@
+-- Snowflake Intelligence Demo: Ridesharing Company
+-- Step 1: Create Database Schema
+
+-- Create database and schema
+CREATE OR REPLACE DATABASE RIDESHARE_DEMO;
+CREATE OR REPLACE SCHEMA RIDESHARE_DATA;
+
+USE DATABASE RIDESHARE_DEMO;
+USE SCHEMA RIDESHARE_DATA;
+
+-- Clients Table (School Districts, Agencies, etc.)
+CREATE OR REPLACE TABLE CLIENTS (
+    CLIENT_ID VARCHAR(50) PRIMARY KEY,
+    CLIENT_NAME VARCHAR(200),
+    CLIENT_TYPE VARCHAR(50), -- 'School District', 'Agency', 'Direct Family'
+    STATE VARCHAR(50),
+    CITY VARCHAR(100),
+    SIGN_UP_DATE DATE,
+    STATUS VARCHAR(20), -- 'Active', 'Inactive', 'Churned'
+    MONTHLY_BUDGET NUMBER(10,2)
+);
+
+-- CareDrivers Table
+CREATE OR REPLACE TABLE CARE_DRIVERS (
+    DRIVER_ID VARCHAR(50) PRIMARY KEY,
+    DRIVER_NAME VARCHAR(200),
+    STATE VARCHAR(50),
+    CITY VARCHAR(100),
+    SIGN_UP_DATE DATE,
+    CERTIFICATION_COMPLETE_DATE DATE,
+    CERTIFICATION_DAYS NUMBER(10,0),
+    STATUS VARCHAR(20), -- 'Active', 'Inactive', 'In Training'
+    MARKETING_SOURCE VARCHAR(100) -- 'Social Media', 'Email', 'Referral', 'Direct'
+);
+
+-- Rides Table
+CREATE OR REPLACE TABLE RIDES (
+    RIDE_ID VARCHAR(50) PRIMARY KEY,
+    CLIENT_ID VARCHAR(50),
+    DRIVER_ID VARCHAR(50),
+    RIDE_DATE DATE,
+    RIDE_TIME TIME,
+    STUDENT_TYPE VARCHAR(100), -- 'General', 'Special Needs', 'McKinney-Vento', 'Foster Care'
+    RIDE_COST NUMBER(10,2),
+    RIDE_STATUS VARCHAR(50), -- 'Completed', 'Cancelled', 'No-Show'
+    CANCELLATION_REASON VARCHAR(200),
+    REQUEST_TIMESTAMP TIMESTAMP_NTZ,
+    CONFIRMATION_TIMESTAMP TIMESTAMP_NTZ,
+    WAIT_TIME_MINUTES NUMBER(10,2),
+    PICKUP_LAT NUMBER(10,6),
+    PICKUP_LON NUMBER(10,6),
+    DROPOFF_LAT NUMBER(10,6),
+    DROPOFF_LON NUMBER(10,6),
+    FOREIGN KEY (CLIENT_ID) REFERENCES CLIENTS(CLIENT_ID),
+    FOREIGN KEY (DRIVER_ID) REFERENCES CARE_DRIVERS(DRIVER_ID)
+);
+
+-- Marketing Campaigns Table
+CREATE OR REPLACE TABLE MARKETING_CAMPAIGNS (
+    CAMPAIGN_ID VARCHAR(50) PRIMARY KEY,
+    CAMPAIGN_NAME VARCHAR(200),
+    CAMPAIGN_TYPE VARCHAR(50), -- 'CareDriver Recruitment', 'Client Acquisition', 'Brand Awareness'
+    CHANNEL VARCHAR(50), -- 'Social Media', 'Email', 'Search', 'Display'
+    START_DATE DATE,
+    END_DATE DATE,
+    AD_SPEND NUMBER(10,2),
+    TARGET_AUDIENCE VARCHAR(100) -- 'Drivers', 'Schools', 'Families'
+);
+
+-- Campaign Results Table
+CREATE OR REPLACE TABLE CAMPAIGN_RESULTS (
+    RESULT_ID VARCHAR(50) PRIMARY KEY,
+    CAMPAIGN_ID VARCHAR(50),
+    METRIC_TYPE VARCHAR(50), -- 'Driver Signups', 'Client Signups', 'Leads', 'Revenue'
+    METRIC_VALUE NUMBER(10,2),
+    RESULT_DATE DATE,
+    GEOGRAPHIC_MARKET VARCHAR(100),
+    FOREIGN KEY (CAMPAIGN_ID) REFERENCES MARKETING_CAMPAIGNS(CAMPAIGN_ID)
+);
+
+-- Rider Feedback Table
+CREATE OR REPLACE TABLE RIDER_FEEDBACK (
+    FEEDBACK_ID VARCHAR(50) PRIMARY KEY,
+    RIDE_ID VARCHAR(50),
+    CLIENT_ID VARCHAR(50),
+    DRIVER_ID VARCHAR(50),
+    FEEDBACK_DATE DATE,
+    RATING NUMBER(2,1), -- 1.0 to 5.0
+    COMMENTS VARCHAR(1000),
+    SENTIMENT VARCHAR(20), -- 'Positive', 'Neutral', 'Negative'
+    FOREIGN KEY (RIDE_ID) REFERENCES RIDES(RIDE_ID),
+    FOREIGN KEY (CLIENT_ID) REFERENCES CLIENTS(CLIENT_ID),
+    FOREIGN KEY (DRIVER_ID) REFERENCES CARE_DRIVERS(DRIVER_ID)
+);
+
+-- Market Leads Table
+CREATE OR REPLACE TABLE MARKET_LEADS (
+    LEAD_ID VARCHAR(50) PRIMARY KEY,
+    LEAD_NAME VARCHAR(200),
+    LEAD_TYPE VARCHAR(50), -- 'School District', 'Agency', 'Family'
+    STATE VARCHAR(50),
+    CITY VARCHAR(100),
+    LEAD_DATE DATE,
+    CONVERTED_TO_CLIENT BOOLEAN,
+    CONVERSION_DATE DATE,
+    MARKETING_SOURCE VARCHAR(100)
+);
+
+-- Create a view for easy querying
+CREATE OR REPLACE VIEW RIDE_DETAILS AS
+SELECT 
+    r.RIDE_ID,
+    r.RIDE_DATE,
+    r.RIDE_TIME,
+    r.RIDE_COST,
+    r.RIDE_STATUS,
+    r.STUDENT_TYPE,
+    r.CANCELLATION_REASON,
+    r.WAIT_TIME_MINUTES,
+    r.PICKUP_LAT,
+    r.PICKUP_LON,
+    c.CLIENT_ID,
+    c.CLIENT_NAME,
+    c.CLIENT_TYPE,
+    c.STATE AS CLIENT_STATE,
+    c.CITY AS CLIENT_CITY,
+    d.DRIVER_ID,
+    d.DRIVER_NAME,
+    d.STATE AS DRIVER_STATE,
+    d.CITY AS DRIVER_CITY
+FROM RIDES r
+JOIN CLIENTS c ON r.CLIENT_ID = c.CLIENT_ID
+JOIN CARE_DRIVERS d ON r.DRIVER_ID = d.DRIVER_ID;
+
+COMMENT ON TABLE CLIENTS IS 'Contains information about all clients including school districts, agencies, and families';
+COMMENT ON TABLE CARE_DRIVERS IS 'Contains information about all CareDrivers including certification details';
+COMMENT ON TABLE RIDES IS 'Contains detailed information about all rides including student types and timing';
+COMMENT ON TABLE MARKETING_CAMPAIGNS IS 'Contains information about marketing campaigns for driver recruitment and client acquisition';
+COMMENT ON TABLE CAMPAIGN_RESULTS IS 'Contains metrics and results from marketing campaigns';
+COMMENT ON TABLE RIDER_FEEDBACK IS 'Contains feedback and ratings from riders and families';
+COMMENT ON TABLE MARKET_LEADS IS 'Contains information about potential clients and conversion tracking';
